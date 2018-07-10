@@ -14,9 +14,11 @@ class Api::V1::GamesController < ApplicationController
 
     # eventually change this index method to a create method...just using index for starters
     def create
-      byebug
+
+        category = params[:category]
+        difficulty = params[:difficulty]
         # Todo - take in the form from frontEnd and use those values to request from API
-        results = RestClient.get('https://opentdb.com/api.php?amount=10&category=11&difficulty=easy&type=multiple')
+        results = RestClient.get('https://opentdb.com/api.php?amount=10&category='+ category.to_s + '&difficulty='+ difficulty + '&type=multiple')
         questions = JSON.parse(results)
         # Todo - then create new game...map over questions["results"] and find_or_create_by for each question object...ALSO, eventually associate the current user to this @game instance
         @game = Game.create()
@@ -47,7 +49,7 @@ class Api::V1::GamesController < ApplicationController
         #     GameQuestion.create(game_id: @game.id, question_id: question.id)
         # end
 
-        byebug
+
 
         render json: @game
 
@@ -58,6 +60,6 @@ class Api::V1::GamesController < ApplicationController
         # receive the finished game data and update the game with the score
     end
 
-
+# <ActionController::Parameters {"category"=>12, "difficulty"=>"medium", "controller"=>"api/v1/games", "action"=>"create", "game"=>{}} permitted: false>
 
 end
