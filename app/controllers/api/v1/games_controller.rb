@@ -44,6 +44,8 @@ class Api::V1::GamesController < ApplicationController
             GameQuestion.create(game_id: @game.id, question_id: question.id)
         end
 
+        new_questions.push({game_id: @game.id})
+
         # We're adding each question that exists to the new game being made...last game has same number of questions as total number of questions
         # Question.all.each do |question|
         #     GameQuestion.create(game_id: @game.id, question_id: question.id)
@@ -51,7 +53,7 @@ class Api::V1::GamesController < ApplicationController
 
 
 
-        render json: @game
+        render json: new_questions
 
     end
 
