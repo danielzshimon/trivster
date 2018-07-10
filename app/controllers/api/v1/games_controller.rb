@@ -2,10 +2,10 @@ require 'rest-client'
 
 class Api::V1::GamesController < ApplicationController
 
-    # def index
-    #    @games = Game.all
-    #    render json: @games
-    # end
+    def index
+       @games = Game.all
+       render json: @games
+    end
 
     # def show
     #     @game = Game.find(params[:game_id])
@@ -13,11 +13,12 @@ class Api::V1::GamesController < ApplicationController
     # end
 
     # eventually change this index method to a create method...just using index for starters
-    def index
-        # TODO - take in the form from frontEnd and use those values to request from API
+    def create
+      byebug
+        # Todo - take in the form from frontEnd and use those values to request from API
         results = RestClient.get('https://opentdb.com/api.php?amount=10&category=11&difficulty=easy&type=multiple')
         questions = JSON.parse(results)
-        # TODO - then create new game...map over questions["results"] and find_or_create_by for each question object...ALSO, eventually associate the current user to this @game instance
+        # Todo - then create new game...map over questions["results"] and find_or_create_by for each question object...ALSO, eventually associate the current user to this @game instance
         @game = Game.create()
 
         # questions["results"].each do |question|
@@ -25,13 +26,13 @@ class Api::V1::GamesController < ApplicationController
         # end
 
         # questions["results"].each do |questionObj|
-        #     Question.where(question: questionObj["question"]).first_or_create do |question| 
+        #     Question.where(question: questionObj["question"]).first_or_create do |question|
         #         question.answer = questionObj["correct_answer"]
         #         question.incorrect_answers = (questionObj["incorrect_answers"])
         #     end
         # end
         new_questions = questions["results"].map do |questionObj|
-            Question.where(question: questionObj["question"]).first_or_create do |question| 
+            Question.where(question: questionObj["question"]).first_or_create do |question|
                 question.answer = questionObj["correct_answer"]
                 question.incorrect_answers = (questionObj["incorrect_answers"])
             end
@@ -47,7 +48,7 @@ class Api::V1::GamesController < ApplicationController
         # end
 
         byebug
-        
+
         render json: @game
 
     end
