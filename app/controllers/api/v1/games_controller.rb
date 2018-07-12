@@ -2,29 +2,34 @@ require 'rest-client'
 
 class Api::V1::GamesController < ApplicationController
 
-    # def index
-    #    @games = Game.all
-    #    render json: @games
-    # end
+    def index
+       @games = Game.all
+       render json: @games
+    end
 
     # def show
     #     @game = Game.find(params[:game_id])
     #     render json: @game
     # end
 
-    # eventually change this index method to a create method...just using index for starters
-    def index
-        category_number = params[]
-        difficulty = params[]
+    def create
 
-        # TODO - take in the form from frontEnd and use those values to request from API
-        results = RestClient.get('https://opentdb.com/api.php?amount=10&category=11&difficulty=easy&type=multiple')
-        questions = JSON.parse(results)
-        # TODO - then create new game...map over questions["results"] and find_or_create_by for each question object...ALSO, eventually associate the current user to this @game instance
+        category = params[:category]
+        difficulty = params[:difficulty]
+        # byebug
+        if category == 1  
+            # https://opentdb.com/api.php?amount=10&difficulty=easy
+            results = RestClient.get('https://opentdb.com/api.php?amount=10&difficulty='+ difficulty + '&type=multiple')
+            questions = JSON.parse(results)
+        else 
+            results = RestClient.get('https://opentdb.com/api.php?amount=10&category='+ category.to_s + '&difficulty='+ difficulty + '&type=multiple')
+            questions = JSON.parse(results)
+        end
+
         @game = Game.create()
 
         new_questions = questions["results"].map do |questionObj|
-            Question.where(question: questionObj["question"]).first_or_create do |question| 
+            Question.where(question: questionObj["question"]).first_or_create do |question|
                 question.answer = questionObj["correct_answer"]
                 question.incorrect_answers = (questionObj["incorrect_answers"])
             end
@@ -34,8 +39,9 @@ class Api::V1::GamesController < ApplicationController
             GameQuestion.create(game_id: @game.id, question_id: question.id)
         end
 
-        
-        render json: @game
+        new_questions.push({game_id: @game.id})
+
+        render json: new_questions
 
     end
 
@@ -44,6 +50,6 @@ class Api::V1::GamesController < ApplicationController
         # receive the finished game data and update the game with the score
     end
 
-
+# <ActionController::Parameters {"category"=>12, "difficulty"=>"medium", "controller"=>"api/v1/games", "action"=>"create", "game"=>{}} permitted: false>
 
 end
